@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TICCAD Quest — El Templo Digital</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet" />
+  
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      min-height: 100vh;
+      max-height: 100vh;
+      overflow: hidden !important;
+      box-sizing: border-box;
+    }
+
+    .screen {
+      height: 100vh;
+      max-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      box-sizing: border-box;
+      padding: 15px;
+      overflow: hidden !important;
+    }
+
+    .start-container, .end-container {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+      width: 100%;
+      max-width: 800px;
+      gap: 10px;
+      box-sizing: border-box;
+    }
+
+    .story-section {
+      margin: 5px 0;
+      padding: 10px;
+    }
+
+    .info-grid {
+      gap: 8px !important;
+      margin-bottom: 5px;
+    }
+
+    #screen-start {
+      overflow-y: auto !important;
+      justify-content: flex-start !important;
+      padding-top: 20px;
+      padding-bottom: 20px;
+    }
+    #screen-start .start-container {
+      justify-content: flex-start !important;
+    }
+    .start-controls-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      margin-top: 5px;
+      min-height: 80px;
+      justify-content: center;
+    }
+    .time-selector-wrapper {
+      display: flex;
+      gap: 10px;
+    }
+    .btn-time-select {
+      padding: 0.5rem 1.5rem;
+      background: #0f1a2c;
+      border: 2px solid var(--border-glass);
+      color: #fff;
+      font-family: var(--ff-display);
+      font-weight: 700;
+      border-radius: var(--r-pill);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-time-select.active {
+      border-color: var(--neon-amber);
+      box-shadow: 0 0 10px rgba(255, 184, 48, 0.4);
+      background: rgba(255, 184, 48, 0.1);
+    }
+
+    .info-grid .info-card {
+      opacity: 0;
+    }
+  </style>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        document.addEventListener("contextmenu", function(evento) {
+            evento.preventDefault();
+        }, false);
+
+        document.addEventListener("keydown", function(evento) {
+            if (evento.key === "F12" || evento.keyCode === 123) {
+                evento.preventDefault();
+                return false;
+            }
+            if (evento.ctrlKey && evento.shiftKey && (evento.key === "I" || evento.key === "i" || evento.keyCode === 73)) {
+                evento.preventDefault();
+                return false;
+            }
+            if (evento.ctrlKey && shiftKey && (evento.key === "J" || evento.key === "j" || evento.keyCode === 74)) {
+                evento.preventDefault();
+                return false;
+            }
+            if (evento.ctrlKey && evento.shiftKey && (evento.key === "C" || evento.key === "c" || evento.keyCode === 67)) {
+                evento.preventDefault();
+                return false;
+            }
+            if (evento.ctrlKey && (evento.key === "U" || evento.key === "u" || evento.keyCode === 85)) {
+                evento.preventDefault();
+                return false;
+            }
+            if (evento.metaKey && evento.altKey && (evento.key === "I" || evento.key === "i" || evento.key === "J" || evento.key === "j" || evento.key === "C" || evento.key === "c" || evento.key === "U" || evento.key === "u")) {
+                evento.preventDefault();
+                return false;
+            }
+        }, false);
+
+        setInterval(function() {
+            debugger;
+        }, 100);
+    });
+  </script>
+</head>
+<body>
+
+  <audio id="sound-inicio" src="inicio.mp3" preload="auto" loop></audio>
+  <audio id="sound-pasar-mouse" src="pasar_mouse.mp3" preload="auto"></audio>
+  <audio id="sound-freez" src="freez.mp3" preload="auto"></audio>
+  <audio id="sound-error" src="error.mp3" preload="auto"></audio>
+  <audio id="sound-perder-vida" src="perder_vida.mp3" preload="auto"></audio>
+  <audio id="sound-campana" src="campana.mp3" preload="auto"></audio>
+  <audio id="sound-mov-resp" src="mov_resp.mp3" preload="auto"></audio>
+  
+  <audio id="sound-perder" src="voz_pirata.mp3" preload="auto"></audio>
+  <audio id="sound-success" src="diamante.mp3" preload="auto"></audio>
+  <audio id="sound-clic" src="splash.mp3" preload="auto"></audio>
+  <audio id="sound-nivel" src="diamante_callendo.mp3" preload="auto"></audio>
+  <audio id="sound-splash" src="spla.mp3" preload="auto"></audio>
+  <audio id="sound-ultimo10" src="ultimo10seg.mp3" preload="auto"></audio>
+  <audio id="sound-ultimo3" src="ultimo3seg.mp3" preload="auto"></audio>
+
+  <div id="screen-start" class="screen active">
+    <div class="grid-bg" aria-hidden="true"></div>
+    <div class="glow-orb orb-1" aria-hidden="true"></div>
+    <div class="glow-orb orb-2" aria-hidden="true"></div>
+
+    <div class="start-container">
+      <header class="logo-area" id="init-logo-area">
+        <div class="logo-icon" aria-hidden="true">🏛️</div>
+        <h1 class="logo-title">
+          TICCAD<span class="accent-purple">Quest</span>
+        </h1>
+        <p class="logo-subtitle">
+          El Templo Perdido del Aprendizaje Digital
+        </p>
+        
+        <div id="preloader-wrapper" class="preloader-wrapper">
+          <div id="init-loading-text" class="loading-mission-text">Cargando misión... <span id="loading-percentage">0%</span></div>
+          <div class="preloader-bar-track">
+            <div id="preloader-bar-fill" class="preloader-bar-fill"></div>
+          </div>
+        </div>
+      </header>
+
+      <div class="start-controls-group">
+        <button id="btn-start" class="btn-primary" aria-label="Comenzar el juego" style="display: none; opacity: 0;">
+          ▶ &nbsp;INICIAR DESAFÍO
+        </button>
+      </div>
+
+      <div id="animated-intro-wrapper" class="intro-hidden-flow">
+        
+        <section class="story-section" aria-label="Prólogo del Reto">
+          <p><strong>📜 LA LEYENDA DEL TEMPLO DIGITAL:</strong> Has ingresado al santuario ancestral de las <em>Tecnologías de la Información, Comunicación, Conocimiento y Aprendizaje Digital (TICCAD)</em>. Las puertas lógicas del templo se han cerrado de golpe.</p>
+          <p>Para escapar y demostrar tus competencias pedagógicas y tecnológicas, deberás ordenar los fragmentos del saber distribuidos en <strong>5 niveles de dificultad creciente</strong>. Clasifica con precisión cada concepto antes de que el contador de energía colapse.</p>
+        </section>
+
+        <section id="game-objective-box" class="objective-card-panel" style="display: none;">
+          <span class="objective-icon">🎯</span>
+          <div class="objective-typing-container">
+            <span class="objective-title">OBJETIVO DEL DESAFÍO:</span>
+            <span id="typing-objective-text"></span><span class="typing-cursor">|</span>
+          </div>
+        </section>
+
+        <section id="game-instructions-grid" class="info-grid" aria-label="Instrucciones del juego">
+          <div class="info-card">
+            <span class="info-icon" aria-hidden="true">🎯</span>
+            <span>Clasifica cada concepto en su categoría correcta</span>
+          </div>
+          <div class="info-card">
+            <span class="info-icon" aria-hidden="true">👆</span>
+            <span>Arrastra la tarjeta o tócala y selecciona una zona</span>
+          </div>
+          <div class="info-card">
+            <span class="info-icon" aria-hidden="true">⭐</span>
+            <span>3 esferas de vida · <strong>+15</strong> puntos · <strong>-5</strong> por error</span>
+          </div>
+          <div class="info-card">
+            <span class="info-icon" aria-hidden="true">⚡</span>
+            <span>Avanza de nivel de inmediato cada 3 aciertos</span>
+          </div>
+          <div class="info-card">
+            <span class="info-icon" aria-hidden="true">⏱️</span>
+            <span>Configura tu temporizador global para el desafío</span>
+          </div>
+          <div class="info-card">
+            <span class="info-icon" aria-hidden="true">💎</span>
+            <span>¡Desbloquea el Cristal Final completando el Nivel 5!</span>
+          </div>
+        </section>
+
+        <div id="game-categories-preview" class="categories-preview" aria-label="Categorías del juego" style="opacity:0; transform: translateY(-20px); transition: all 0.5s ease;">
+          <span class="cat-badge cat-def">📖 Definición</span>
+          <span class="cat-badge cat-car">⚙️ Característica</span>
+          <span class="cat-badge cat-ben">✨ Beneficio</span>
+        </div>
+
+        <div id="high-scores-container" class="high-scores-panel" style="opacity:0; transform: translateY(-20px); transition: all 0.5s ease;">
+          <div class="high-scores-header">🏆 MEJORES PUNTAJES 🏆</div>
+          <div id="high-scores-list" class="high-scores-list">-- Cargando --</div>
+        </div>
+
+        <div id="time-selector-wrapper-box" class="time-selector-wrapper-box" style="opacity:0; transform: translateY(-20px); transition: all 0.5s ease;">
+          <p class="time-selector-title">⚡ SELECCIONA TU TIEMPO PARA INICIAR LA MISIÓN ⚡</p>
+          <div class="time-selector-wrapper">
+            <button id="btn-time-90" class="btn-time-select active" data-time="90">⏱️ 90 SEGUNDOS</button>
+            <button id="btn-time-140" class="btn-time-select" data-time="140">⏳ 140 SEGUNDOS</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div id="countdown-screen-overlay" class="countdown-fullscreen-overlay">
+    <div id="countdown-number-box" class="countdown-big-number"></div>
+  </div>
+
+  <div id="screen-game" class="screen">
+    <div class="grid-bg" aria-hidden="true"></div>
+
+    <header class="hud" aria-label="Panel de Estado">
+      <div class="hud-group">
+        <span class="hud-label">VIVIFICACIÓN</span>
+        <div id="hud-lives" class="hud-lives" role="img" aria-label="3 vidas restantes"></div>
+      </div>
+
+      <div class="hud-group">
+        <span class="hud-label">NIVEL ACTUAL</span>
+        <div class="hud-level-box">
+          <span class="level-indicator">NIVEL <span id="level-num">1</span></span>
+          <div class="progress-track" aria-hidden="true">
+            <div id="progress-fill" class="progress-fill"></div>
+          </div>
+          <span id="progress-label" class="progress-label">0/3</span>
+        </div>
+      </div>
+
+      <div class="hud-group">
+        <span class="hud-label">PUNTAJE</span>
+        <div id="score-num" class="hud-value neon-cyan">0000</div>
+      </div>
+
+      <div class="hud-group">
+        <span class="hud-label">RACHA 🔥</span>
+        <div id="combo-value" class="hud-value neon-amber">x0</div>
+      </div>
+
+      <div id="hud-timer" class="hud-group hud-timer-box">
+        <span class="hud-label">TIEMPO LÍMITE</span>
+        <div id="timer-num" class="hud-value neon-pink">90s</div>
+      </div>
+    </header>
+
+    <main class="game-layout">
+      <div id="escape-narrative" class="escape-narrative">
+        Cargando registros del entorno virtual...
+      </div>
+
+      <div class="game-action-toolbar">
+        <button id="btn-pause-toggle" class="toolbar-btn btn-pause" aria-label="Pausar o congelar el tiempo">⏸️ CONGELAR TIEMPO</button>
+        <button id="btn-inline-restart" class="toolbar-btn btn-reset-game" aria-label="Reiniciar el juego actual">🔄 REINICIAR</button>
+      </div>
+
+      <section class="card-container" aria-label="Concepto a clasificar">
+        <div id="game-card" class="game-card efecto-rebote" draggable="true" style="visibility: hidden;">
+          <div class="card-border-glow"></div>
+          <div class="card-content">
+            <span id="card-tag" class="card-tag">SABER TICCAD</span>
+            <p id="card-text" class="card-text">...</p>
+            <div class="card-footer">
+              <span class="drag-hint-desktop">✥ Arrastra hacia tu respuesta</span>
+              <span class="drag-hint-mobile">👆 Toca y selecciona una zona inferior</span>
+            </div>
+          </div>
+          
+          <button id="btn-hint" class="hint-pill" aria-label="Mostrar ayuda conceptual">💡 Pista</button>
+          <div id="card-hint" class="card-hint-balloon" role="tooltip">...</div>
+          
+          <button id="powerup-btn" class="powerup-pill" style="display: none;">✨ REVELAR CATEGORÍA</button>
+        </div>
+
+        <div id="pause-overlay" class="pause-card-overlay">
+          <div class="pause-content">
+            <h3>TEMPLO EN PAUSA</h3>
+            <p>El flujo del tiempo se ha congelado de manera segura.</p>
+            <button id="btn-resume-game" class="btn-primary-small">REANUDAR FLUJO</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="drop-zones-container" aria-label="Zonas de destino de clasificación">
+        <div class="drop-zone zone-def" data-category="definicion" role="button" tabindex="0" aria-label="Clasificar como Definición">
+          <div class="zone-glow"></div>
+          <span class="zone-icon">📖</span>
+          <h2 class="zone-title">DEFINICIÓN</h2>
+          <p class="zone-desc">¿Qué es o qué compone la estructura?</p>
+        </div>
+
+        <div class="drop-zone zone-car" data-category="caracteristica" role="button" tabindex="0" aria-label="Clasificar como Característica">
+          <div class="zone-glow"></div>
+          <span class="zone-icon">⚙️</span>
+          <h2 class="zone-title">CARACTERÍSTICA</h2>
+          <p class="zone-desc">¿Cómo funciona o qué rasgos posee?</p>
+        </div>
+
+        <div class="drop-zone zone-ben" data-category="beneficio" role="button" tabindex="0" aria-label="Clasificar como Beneficio">
+          <div class="zone-glow"></div>
+          <span class="zone-icon">✨</span>
+          <h2 class="zone-title">BENEFICIO</h2>
+          <p class="zone-desc">¿Qué impacto positivo o ventajas aporta?</p>
+        </div>
+      </section>
+    </main>
+
+    <div id="feedback-overlay" class="feedback-overlay" aria-hidden="true"></div>
+
+    <div id="levelup-banner" class="levelup-banner" aria-hidden="true">
+      <div id="levelup-particles" class="levelup-particles"></div>
+      <div class="levelup-box">
+        <span class="levelup-tag">PUERTA DESBLOQUEADA</span>
+        <h2 class="levelup-title">¡ACCESO AL NIVEL <span id="new-level">2</span>!</h2>
+        <p class="levelup-desc">Los algoritmos del templo se reconfiguran...</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="screen-end" class="screen">
+    <div class="grid-bg" aria-hidden="true"></div>
+
+    <div class="end-container efecto-rebote">
+      <div id="end-trophy" class="end-trophy" aria-hidden="true">💎</div>
+      <h2 class="end-title" id="end-title">¡Partida Finalizada!</h2>
+
+      <div id="end-narrative" class="end-narrative"></div>
+
+      <div class="end-score-box" aria-label="Puntaje final">
+        <div class="end-score-label">PUNTAJE FINAL</div>
+        <div class="end-score-num" id="end-score">0</div>
+      </div>
+
+      <div class="end-stats" role="list" aria-label="Estadísticas">
+        <div class="stat-item" role="listitem">
+          <span class="stat-icon" aria-hidden="true">✅</span>
+          <span class="stat-label">Aciertos</span>
+          <span class="stat-val" id="stat-correct">0</span>
+        </div>
+        <div class="stat-item" role="listitem">
+          <span class="stat-icon" aria-hidden="true">❌</span>
+          <span class="stat-label">Errores</span>
+          <span class="stat-val" id="stat-wrong">0</span>
+        </div>
+        <div class="stat-item" role="listitem">
+          <span class="stat-icon" aria-hidden="true">⬆️</span>
+          <span class="stat-label">Nivel máx.</span>
+          <span class="stat-val" id="stat-level">1</span>
+        </div>
+        <div class="stat-item" role="listitem">
+          <span class="stat-icon" aria-hidden="true">🔥</span>
+          <span class="stat-label">Máx. racha</span>
+          <span class="stat-val" id="stat-maxcombo">0</span>
+        </div>
+      </div>
+
+      <div class="end-grade" aria-label="Calificación obtenida">
+        <span class="grade-label">Rango Universitario</span>
+        <span id="grade-value" class="grade-value">Insuficiente — 0/100</span>
+      </div>
+
+      <button id="btn-restart" class="btn-primary" aria-label="Volver a intentar">
+        🔄 &nbsp;REINICIAR DESAFÍO
+      </button>
+    </div>
+  </div>
+
+  <div id="custom-modal" class="custom-modal-overlay">
+    <div class="custom-modal-box effect-bounce">
+      <div id="modal-icon" class="modal-cyber-icon">🏆</div>
+      <h3 id="modal-title">¡NUEVO RÉCORD!</h3>
+      <p id="modal-desc">Ingresa tus iniciales (3 letras):</p>
+      
+      <div id="modal-input-container">
+        <input type="text" id="modal-input" maxlength="3" placeholder="EXP" autocomplete="off" />
+      </div>
+
+      <div class="modal-buttons-layout">
+        <button id="modal-btn-confirm" class="modal-btn btn-confirm">ACEPTAR</button>
+        <button id="modal-btn-cancel" class="modal-btn btn-cancel" style="display:none;">CANCELAR</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="scripts.js"></script>
+</body>
+</html>
